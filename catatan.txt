@@ -1,0 +1,5 @@
+unutk memasukkan package nodejs ke browser gunakan perintah dibawah
+
+- masukkan package nodejs ke custom.js
+- ketik perintah dibawah pada terminal untuk generate file bundle
+- browserify custom.js -o public/bundle.js

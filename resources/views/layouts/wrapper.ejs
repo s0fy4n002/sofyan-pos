@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title><%= title %></title>
+    <%- include('head') %>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic"
+    />
+    <link rel="stylesheet" href="css/app.css" />
+  </head>
+
+  <body class="sidebar-mini wysihtml5-supported fixed skin-blue-light">
+    <div class="wrapper">
+      <%- include('navbar.ejs') %> <%- include('sidebar.ejs') %> <%- body %> <%-
+      include('footer.ejs') %> <%- include('controlSidebar.ejs') %>
+    </div>
+    <%- include('script.ejs') %>
+  </body>
+</html>

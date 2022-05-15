@@ -1,0 +1,28 @@
+git init
+git config user.name "someone"
+git config user.email "someone@someplace.com"
+git add *
+git commit -m "some init msg"
+
+cara buat ssh key
+buka terminal 
+ketik "ssh-keygen"
+tulis user github anda
+kosongkan passpharase
+akan ada file .pub
+
+kaitkan akun ssh anda
+ssh-agent /bin/bash -> untuk menjalankan ssh agent
+ssh-add ~/.ssh/id_anda -> load ssh key
+ssh-add -l -> cek apakah sdh terkait dgn perintah 
+copy paste id_ssh.pub ke github
+ssh -T git@github.com -> test konektifitas authenticated
+selesai
+
+
+Add a file called composer.json to the root directory by running touch composer.json
+Add a file called index.php to the root directory by running touch index.php
+Rename the homepage (e.g. index.html) to home.html
+In index.php, add the following line: <?php include_once("home.html"); ?>
+In composer.json, add the following line: {}
+Run git push heroku master

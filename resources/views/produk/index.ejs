@@ -1,0 +1,82 @@
+<div class="content-wrapper">
+  <section class="content-header">
+    <h1>
+      Produk
+
+      <small>Control panel</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li>
+        <a href="/"><i class="fa fa-dashboard"></i> Home</a>
+      </li>
+      <li class="active">Produk</li>
+    </ol>
+  </section>
+  <section class="content">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="row">
+          <div class="col-md-12">
+            <button
+              onclick="typeAdd()"
+              type="button"
+              class="btn btn-info btn-sm"
+              data-toggle="modal"
+              data-target="#produkFormModal"
+            >
+              Tambah Produk
+            </button>
+            <button
+              onclick="deleteSelected()"
+              type="button"
+              class="btn btn-danger btn-sm"
+            >
+              Hapus
+            </button>
+            <button
+              onclick="cetakBarcode()"
+              type="button"
+              class="btn btn-warning btn-sm"
+            >
+              Cetak Barcode
+            </button>
+          </div>
+        </div>
+        <div class="card" style="margin-top: 10px">
+          <div class="mt-2 panel panel-default">
+            <!-- Default panel contents -->
+            <div class="panel-heading">Panel heading</div>
+            <div class="panel-body" style="overflow: scroll">
+              <table id="dt" class="table">
+                <thead>
+                  <th>No</th>
+                  <th>
+                    <input
+                      style="width: 20px; height: 20px"
+                      type="checkbox"
+                      name="select_all"
+                    />
+                  </th>
+                  <th>Kode Produk</th>
+                  <th>Nama Produk</th>
+                  <th>Kategori</th>
+                  <th>Merk</th>
+                  <th>Harga Beli</th>
+                  <th>Harga Jual</th>
+                  <th>Diskon</th>
+                  <th>Stok</th>
+                  <th width="15%">Edit</th>
+                </thead>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div id="wrapper"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<%- include('./partials/modal.ejs') %> <%- include('./partials/script.ejs') %>

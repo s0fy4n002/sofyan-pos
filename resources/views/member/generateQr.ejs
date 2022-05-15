@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        width: 100vw;
+        height: 100vh;
+        background-color: lightblue !important;
+      }
+      body #pageContent {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        height: inherit;
+        width: inherit;
+        gap: 10px;
+      }
+      body #pageContent .description {
+        display: flex;
+        flex-direction: column;
+        /* justify-content: center; */
+        align-items: center;
+        min-width: 200px;
+        height: 300px;
+        background: url('http://localhost:3000/cardid.jpg') !important;
+        position: relative;
+        object-fit: cover;
+      }
+      body #pageContent .description p:nth-child(1) {
+        padding-top: 10px;
+      }
+      body #pageContent .description p {
+        color: white !important;
+      }
+
+      body #pageContent .description img {
+        width: 100px;
+        height: 110px;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+      }
+    </style>
+    <title><%= title %></title>
+  </head>
+  <body>
+    <div id="pageContent">
+      <% dataUrl.forEach(item => { %>
+      <div class="description">
+        <p><%= item.nama %></p>
+        <p><%= item.alamat %></p>
+        <p><%= item.telepon %></p>
+        <img src="<%= item.data %>" alt="qrcode" />
+      </div>
+
+      <% }) %>
+    </div>
+  </body>
+</html>

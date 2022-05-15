@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+
+      body #pageContent {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        background-color: lightcoral !important;
+        width: 100vw;
+        height: 100vh;
+        gap: 10px;
+      }
+      body #pageContent .description {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        min-width: 100px;
+        background-color: lightblue !important;
+      }
+      body #pageContent .description p:nth-child(2) {
+      }
+
+      body #pageContent .description img {
+        padding-bottom: 30px;
+      }
+    </style>
+    <title><%= title %></title>
+  </head>
+  <body>
+    <div id="pageContent">
+      <% dataUrl.forEach(item => { %>
+      <div class="description">
+        <p><%= item.nama %></p>
+        <p class="body"><%= item.id %></p>
+        <p class="body"><%= item.hargaJual %></p>
+        <img src="<%= item.data %>" alt="qrcode" />
+      </div>
+      <% }) %>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,209 @@
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<script>
+  let table = null;
+  const instance = axios.create({
+    withCredentials: true,
+  });
+
+  const checkboxParent = document.querySelector("[name='select_all']");
+  checkboxParent.addEventListener('click', function (e) {
+    const checkboxChild = document.querySelectorAll(
+      ".table tbody [type='checkbox']"
+    );
+    if (checkboxParent.checked === true) {
+      checkboxChild.forEach((item) => {
+        item.checked = true;
+      });
+    } else {
+      checkboxChild.forEach((item) => {
+        item.checked = false;
+      });
+    }
+  });
+
+  function cetakBarcode() {
+    //abmil semua element input yg tipe nya checkbox
+    const checkboxChild = document.querySelectorAll(
+      ".table tbody [type='checkbox']"
+    );
+    //ambil yang di centang
+    const checked = [...checkboxChild].filter((item) => {
+      return item.checked === true;
+    });
+    if (checked < 1) {
+      Swal.fire('Gagal', 'Pilih yang akan di cetak!', 'warning');
+      return false;
+    }
+    //tambahkan nama dan value
+    const checkedValue = checked.map((item, index) => {
+      return {
+        name: item.name,
+        id: item.value,
+      };
+    });
+    //buat element form
+    const form = document.createElement('form');
+    //atribut method = post
+    form.setAttribute('method', 'post');
+    //atribut action = url anda
+    form.setAttribute('action', `${url}/member/cetak_barcode`);
+    //atribut target = _black
+    form.setAttribute('target', '_blank');
+    //checkedValue = [{},{}]
+    for (const item of checkedValue) {
+      let input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = item.name;
+      input.value = item.id;
+      form.appendChild(input);
+    }
+    const card = document.querySelector('body .card');
+    card.appendChild(form);
+    form.submit();
+  }
+
+  async function editmember(id) {
+    const nama = document.querySelector("[name='nama']");
+    const alamat = document.querySelector("[name='alamat']");
+    const telepon = document.querySelector("[name='telepon']");
+    const idInput = document.querySelector("[name='id']");
+
+    $('#memberModal').modal('show');
+    const form = document.querySelector('#form');
+    form.dataset.type = 'update';
+    instance({
+      method: 'post',
+      url: `${url}/member/detail`,
+      data: { id },
+    })
+      .then((res) => {
+        const { data } = res;
+        idInput.value = data._id;
+        nama.value = data.nama;
+        alamat.value = data.alamat;
+        telepon.value = data.telepon;
+      })
+      .catch((err) => {
+        console.info(err);
+      });
+  }
+  function update() {
+    const nama = document.querySelector("[name='nama']").value;
+    const alamat = document.querySelector("[name='alamat']").value;
+    const telepon = document.querySelector("[name='telepon']").value;
+    const id = document.querySelector("[name='id']").value;
+    instance
+      .put(`${url}/member`, { id, nama, alamat, telepon })
+      .then((response) => {
+        table.ajax.reload();
+        Swal.fire(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
+  async function hapusmember(id) {
+    try {
+      const response = await instance.delete(`${url}/member`, {
+        data: { id: id },
+      });
+      table.ajax.reload();
+    } catch (error) {
+      Swal.fire('Fail', error.response.data.message, 'error');
+      console.log(error);
+    }
+  }
+
+  const form = document.querySelector('#form');
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const type = form.dataset.type;
+    type === 'add' && add();
+    type === 'update' && update();
+  });
+  function add() {
+    const nama = document.querySelector("[name='nama']").value;
+    const alamat = document.querySelector("[name='alamat']").value;
+    const telepon = document.querySelector("[name='telepon']").value;
+    instance
+      .post(`${url}/member`, {
+        nama,
+        alamat,
+        telepon,
+      })
+      .then(function (response) {
+        table.ajax.reload();
+        $('#memberModal').modal('hide');
+        Swal.fire(response.data);
+      })
+      .catch(function (error) {
+        Swal.fire({
+          icon: 'error',
+          text: error,
+        });
+        console.log(error);
+      });
+
+    // $('#memberModal').modal('hide');
+  }
+
+  function typeAdd() {
+    const form = document.querySelector('#form');
+    form.dataset.type = 'add';
+  }
+
+  window.addEventListener('load', function () {
+    $(function () {
+      $(document).ready(function () {
+        table = $('#dt').DataTable({
+          processing: false,
+          autoWidth: false,
+          bPaginate: true,
+          select: true,
+          columns: [
+            {
+              mRender: function (data, type, row) {
+                return ` <input style="width:20px;height:20px" type='checkbox' name='${row.nama}' value="${row._id}" />`;
+              },
+            },
+            { data: 'index' },
+            { data: 'nama' },
+            { data: 'alamat' },
+            { data: 'telepon' },
+            {
+              data: '',
+              name: '',
+              title: 'Option',
+              mRender: function (data, type, row) {
+                return `
+                            <div class="btn-group">
+                                <button onclick="editmember('${row._id}')" class="btn btn-info btn-sm">Edit</button>
+                                <button onclick="hapusmember('${row._id}')" class="btn btn-danger btn-sm">Hapus</button>
+                            </div>
+                        `;
+              },
+            },
+          ],
+          language: {
+            emptyTable: 'Tidak ada data',
+          },
+          ajax: {
+            type: 'get',
+            xhrFields: {
+              withCredentials: true,
+            },
+            url: `${url}/api/member`,
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            datasrc: 'data',
+          },
+        });
+      });
+    });
+  });
+</script>

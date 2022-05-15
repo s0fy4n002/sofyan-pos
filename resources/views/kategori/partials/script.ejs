@@ -1,0 +1,126 @@
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<script>
+  let table = null;
+
+  const instance = axios.create({
+    withCredentials: true,
+  });
+  async function hapusKategori(id) {
+    try {
+      const response = await instance.delete(`${url}/kategori`, {
+        data: { id: id },
+      });
+      table.ajax.reload();
+    } catch (error) {
+      Swal.fire('Fail', error.response.data.message, 'error');
+      console.log(error);
+    }
+  }
+  async function editKategori(id) {
+    $('#kategoriModal').modal('show');
+    const form = document.querySelector('#form');
+    form.dataset.type = 'update';
+    instance({
+      method: 'post',
+      url: `${url}/kategori/detail`,
+      data: { id },
+    })
+      .then((res) => {
+        form.querySelector('#kategori').value = res.data.kategori;
+        form.querySelector('#kategori').dataset.id = res.data._id;
+      })
+      .catch((err) => {});
+  }
+
+  function typeAdd() {
+    const form = document.querySelector('#form');
+    form.dataset.type = 'add';
+  }
+
+  $(function () {
+    $(document).ready(function () {
+      table = $('#dt').DataTable({
+        processing: false,
+        autoWidth: false,
+        bPaginate: true,
+        select: true,
+        columns: [
+          { data: 'index' },
+          { data: 'kategori' },
+          {
+            data: '',
+            name: 'edit',
+            title: 'Edit',
+            mRender: function (data, type, row) {
+              return `
+                      <div class="btn-group">
+                          <button onclick="editKategori('${row._id}')" class="btn btn-info btn-sm">Edit</button>
+                          <button onclick="hapusKategori('${row._id}')" class="btn btn-danger btn-sm">Hapus</button>
+                      </div>
+                  `;
+            },
+          },
+        ],
+        language: {
+          emptyTable: 'Tidak ada data',
+        },
+        ajax: {
+          type: 'get',
+          xhrFields: {
+            withCredentials: true,
+          },
+          url: `${url}/api/kategori`,
+          contentType: 'application/json; charset=utf-8',
+          dataType: 'json',
+          datasrc: 'data',
+        },
+      });
+    });
+    const form = document.querySelector('#form');
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const type = form.dataset.type;
+      type === 'add' && add();
+      type === 'update' && update();
+    });
+    function add() {
+      const kategori = document.querySelector('#kategori');
+
+      instance
+        .post(`${url}/kategori`, {
+          kategori: kategori.value,
+        })
+        .then(function (response) {
+          table.ajax.reload();
+          $('#kategoriModal').modal('hide');
+          Swal.fire(response.data);
+        })
+        .catch(function (error) {
+          Swal.fire({
+            icon: 'error',
+            text: error,
+          });
+          console.log(error);
+        });
+
+      // $('#kategoriModal').modal('hide');
+    }
+    function update() {
+      const id = document.querySelector('#kategori').dataset.id;
+      const kategori = document.querySelector('#kategori').value;
+      instance
+        .put(`${url}/kategori`, { id, kategori })
+        .then((response) => {
+          table.ajax.reload();
+          Swal.fire(response.data);
+        })
+        .catch((error) => {
+          console.log(err);
+        });
+    }
+  });
+</script>

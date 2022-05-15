@@ -1,0 +1,78 @@
+<div class="login-box">
+  <!-- /.login-logo -->
+  <div class="login-box-body">
+    <p class="login-box-msg">Buat Account Baru</p>
+
+    <form id="registerForm" action="/login" method="post">
+      <div class="form-group" id="username-form">
+        <input
+          type="text"
+          name="username"
+          class="form-control"
+          placeholder="Username"
+        />
+        <span class="help-block"></span>
+      </div>
+      <div class="form-group" id="email-form">
+        <input
+          type="email"
+          name="email"
+          class="form-control"
+          placeholder="Email"
+        />
+        <span class="help-block"></span>
+      </div>
+      <div class="form-group" id="password-form">
+        <input
+          type="password"
+          class="form-control"
+          placeholder="Password"
+          name="password"
+        />
+        <span class="help-block"></span>
+      </div>
+
+      <div class="row">
+        <div class="col-xs-12">
+          <button type="submit" class="btn btn-primary btn-block btn-flat">
+            Daftar
+          </button>
+        </div>
+        <!-- /.col -->
+      </div>
+    </form>
+    <!-- /.social-auth-links -->
+  </div>
+  <!-- /.login-box-body -->
+</div>
+<script>
+  const form = document.querySelector('#registerForm');
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const username = document.querySelector("[name='username']").value;
+    const email = document.querySelector("[name='email']").value;
+    const password = document.querySelector("[name='password']").value;
+
+    const instance = axios.create({
+      withCredentials: true,
+    });
+    instance
+      .post('/register', { email, username, password })
+      .then(function (response) {
+        // location.replace('/login');
+        Swal.fire({
+          icon: 'success',
+          text: response.data.message,
+        });
+        console.log(response);
+      })
+      .catch(function (error) {
+        console.log(error);
+        Swal.fire({
+          icon: 'error',
+          text: error.response.data.message,
+        });
+      });
+  });
+</script>

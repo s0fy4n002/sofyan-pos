@@ -1,0 +1,272 @@
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="https://unpkg.com/gridjs/dist/gridjs.umd.js"></script>
+
+<script>
+  let table = null;
+  //fungsi untuk menceta barcode
+
+  function cetakBarcode() {
+    //abmil semua element input yg tipe nya checkbox
+    const checkboxChild = document.querySelectorAll(
+      ".table tbody [type='checkbox']"
+    );
+    //ambil yang di centang
+    const checked = [...checkboxChild].filter((item) => {
+      return item.checked === true;
+    });
+    if (checked < 1) {
+      Swal.fire('Gagal', 'Pilih yang akan di cetak!', 'warning');
+      return false;
+    }
+    //tambahkan nama dan value
+    const checkedValue = checked.map((item, index) => {
+      return {
+        name: item.name,
+        id: item.value,
+        ...item.dataset,
+      };
+    });
+    //buat element form
+    const form = document.createElement('form');
+    //atribut method = post
+    form.setAttribute('method', 'post');
+    //atribut action = url anda
+    form.setAttribute('action', `${url}/produk/cetak_barcode`);
+    //atribut target = _black
+    form.setAttribute('target', '_blank');
+    //checkedValue = [{},{}]
+    for (const item of checkedValue) {
+      let input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = item.name;
+      input.value = item.id;
+      form.appendChild(input);
+    }
+    const card = document.querySelector('body .card');
+    card.appendChild(form);
+    form.submit();
+  }
+
+  const checkboxParent = document.querySelector("[name='select_all']");
+  checkboxParent.addEventListener('click', function (e) {
+    const checkboxChild = document.querySelectorAll(
+      ".table tbody [type='checkbox']"
+    );
+    if (checkboxParent.checked === true) {
+      checkboxChild.forEach((item) => {
+        item.checked = true;
+      });
+    } else {
+      checkboxChild.forEach((item) => {
+        item.checked = false;
+      });
+    }
+  });
+
+  function deleteSelected() {
+    const checkboxChild = document.querySelectorAll(
+      ".table tbody [type='checkbox']"
+    );
+    const checked = [...checkboxChild].filter((item) => item.checked === true);
+    if (checked.length < 2) {
+      Swal.fire('Gagal', 'Harus lebih dari 1', 'error');
+      return false;
+    }
+    const data = checked.map((item) => {
+      return item.value;
+    });
+    axios
+      .delete(`${url}/produk_selected`, { data: data })
+      .then((res) => {
+        console.log(res);
+        table.ajax.reload();
+        Swal.fire('Deleted!', 'Your file has been deleted.', 'success');
+      })
+      .catch((err) => {
+        console.log(err);
+        Swal.fire('Fail', 'Your file cannot deleted.', 'error');
+      });
+  }
+
+  async function hapusProduk(id) {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios
+          .delete(`${url}/produk`, { data: { id: id } })
+          .then((res) => {
+            console.log(res);
+            table.ajax.reload();
+            Swal.fire('Deleted!', 'Your file has been deleted.', 'success');
+          })
+          .catch((err) => {
+            console.log(err);
+            Swal.fire('Fail', 'Your file cannot deleted.', 'error');
+          });
+      }
+    });
+  }
+  async function editProduk(id) {
+    $('#produkFormModal').modal('show');
+    const form = document.querySelector('#form');
+    form.dataset.type = 'update';
+    axios({
+      method: 'post',
+      url: `${url}/produk/detail`,
+      data: { id },
+    })
+      .then((res) => {
+        form.querySelector("input[name='id']").value = res.data._id;
+        form.querySelector("input[name='nama']").value = res.data.nama;
+        form.querySelector("select[name='kategoriId']").value =
+          res.data.kategoriId;
+        form.querySelector("input[name='merk']").value = res.data.merk;
+        form.querySelector("input[name='hargaBeli']").value =
+          res.data.hargaBeli;
+        form.querySelector("input[name='hargaJual']").value =
+          res.data.hargaJual;
+        form.querySelector("input[name='stok']").value = res.data.stok;
+        form.querySelector("input[name='diskon']").value = res.data.diskon;
+      })
+      .catch((err) => {});
+  }
+
+  function typeAdd() {
+    const form = document.querySelector('#form');
+    form.dataset.type = 'add';
+  }
+
+  $(function () {
+    $(document).ready(function () {
+      table = $('#dt').DataTable({
+        processing: false,
+        autoWidth: false,
+        bPaginate: true,
+        select: true,
+        columns: [
+          { data: 'index' },
+          {
+            mRender: function (data, type, row) {
+              return ` <input style="width:20px;height:20px" type='checkbox' name='${row.nama}' value="${row._id}" data-hargajual="${row.hargaJual}" data-hargabeli="${row.hargaBeli}" />`;
+            },
+          },
+          { data: '_id' },
+          { data: 'nama' },
+          {
+            data: 'kategoriId',
+            mRender: function (data, type, row) {
+              return `${row.kategoriId.kategori}`;
+            },
+          },
+          { data: 'merk' },
+          { data: 'hargaBeli' },
+          { data: 'hargaJual' },
+          { data: 'diskon' },
+          { data: 'stok' },
+          {
+            data: '',
+            name: 'edit',
+            title: 'Edit',
+            mRender: function (data, type, row) {
+              return `
+                              <div class="btn-group" role="group" >
+                                  <button onclick="editProduk('${row._id}')" class="btn btn-info btn-sm">Edit</button>
+                                  <button onclick="hapusProduk('${row._id}')" class="btn btn-danger btn-sm">Hapus</button>
+                              </div>
+                          `;
+            },
+          },
+        ],
+        language: {
+          emptyTable: 'Tidak ada data',
+        },
+        ajax: {
+          type: 'get',
+          xhrFields: {
+            withCredentials: true,
+          },
+          dataType: 'json',
+          url: `${url}/api/produk`,
+          crossDomain: true,
+          contentType: 'application/json; charset=utf-8',
+          datasrc: 'data',
+        },
+      });
+    });
+    const form = document.querySelector('#form');
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const type = form.dataset.type;
+      type === 'add' && add();
+      type === 'update' && update();
+    });
+    function add() {
+      const nama = document.querySelector("input[name='nama']").value;
+      const alamat = document.querySelector("input[name='alamat']").value;
+      const telepon = document.querySelector("input[name='telepon']").value;
+
+      const data = {
+        nama,
+        alamat,
+        telepon,
+      };
+      console.log(data);
+      axios
+        .post(`${url}/produk/store`, data)
+        .then(function (response) {
+          table.ajax.reload();
+          Swal.fire(response.data);
+        })
+        .catch(function (error) {
+          Swal.fire({
+            icon: 'error',
+            text: error,
+          });
+          console.log(error);
+        });
+
+      // $('#produkFormModal').modal('hide');
+    }
+    function update() {
+      const id = document.querySelector("input[name='id']").value;
+      const nama = document.querySelector("input[name='nama']").value;
+      const kategoriId = document.querySelector(
+        "select[name='kategoriId']"
+      ).value;
+      const merk = document.querySelector("input[name='merk']").value;
+      const hargaBeli = document.querySelector("input[name='hargaBeli']").value;
+      const hargaJual = document.querySelector("input[name='hargaJual']").value;
+      const stok = document.querySelector("input[name='stok']").value;
+      const diskon = document.querySelector("input[name='diskon']").value;
+      axios
+        .put(`${url}/produk/update`, {
+          id,
+          nama,
+          kategoriId,
+          merk,
+          hargaBeli,
+          hargaJual,
+          stok,
+          diskon,
+        })
+        .then((response) => {
+          table.ajax.reload();
+          Swal.fire(response.data);
+          $('#produkFormModal').modal('hide');
+        })
+        .catch((error) => {
+          console.log(err);
+        });
+    }
+  });
+</script>
