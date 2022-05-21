@@ -65,8 +65,8 @@ app.use((req, res, next) => {
   res.locals.formatTerbilang = formatTerbilang;
   next();
 });
-init(app);
 
+app.use(`/.netlify/functions/api`, init(app));
 app.listen(PORT, () => console.log(`server is running on port :${PORT}`));
 module.exports = app;
 module.exports.handler = serverless(app);
