@@ -14,7 +14,7 @@ var cookieParser = require('cookie-parser');
 const passport = require('passport');
 const initPassport = require('./app/config/passport');
 const session = require('express-session');
-
+const serverless = require('serverless-http');
 app.use(
   cors({
     origin: [
@@ -68,3 +68,5 @@ app.use((req, res, next) => {
 init(app);
 
 app.listen(PORT, () => console.log(`server is running on port :${PORT}`));
+module.exports = app;
+module.exports.handler = serverless(app);

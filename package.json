@@ -6,7 +6,8 @@
   "scripts": {
     "watch": "webpack --mode production",
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon index.js",
+    "build": "NODE_ENV=production ./node_modules/.bin/netlify-lambda build src"
   },
   "keywords": [],
   "author": "",
@@ -39,11 +40,13 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.3.0",
     "multer": "^1.4.4",
+    "netlify-lambda": "^2.0.15",
     "passport": "^0.5.2",
     "passport-google-oauth20": "^2.0.0",
     "passport-local": "^1.0.0",
     "puppeteer": "^13.7.0",
     "qrcode": "^1.5.0",
+    "serverless-http": "^3.0.1",
     "session": "^0.1.0",
     "validator": "^13.7.0"
   }
