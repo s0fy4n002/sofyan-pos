@@ -7,7 +7,7 @@
     "watch": "webpack --mode production",
     "start": "node index.js",
     "dev": "nodemon index.js",
-    "build": "NODE_ENV=production ./node_modules/.bin/netlify-lambda build src"
+    "build": "NODE_ENV=production ./node_modules/.bin/netlify-lambda build index.js"
   },
   "keywords": [],
   "author": "",
