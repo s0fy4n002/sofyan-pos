@@ -60,7 +60,7 @@
     instance
       .post('/register', { email, username, password })
       .then(function (response) {
-        // location.replace('/login');
+        location.replace('/login');
         Swal.fire({
           icon: 'success',
           text: response.data.message,

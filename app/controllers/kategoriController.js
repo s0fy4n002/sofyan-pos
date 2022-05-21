@@ -48,17 +48,28 @@ const kategoriController = () => {
     },
     async apiDetail(req, res) {
       const kategori = await Kategori.findById(req.body.id);
-      !kategori && res.json('data tidak ditemukan');
-      res.status(201).json(kategori);
-      return;
+      if (!kategori) {
+        return res.json('data tidak ditemukan');
+      }
+      return res.status(201).json(kategori);
     },
     async update(req, res) {
-      const kategori = await Kategori.findByIdAndUpdate(req.body.id, {
-        kategori: req.body.kategori,
-      });
-      !kategori && res.json('data tidak ditemukan');
-      res.status(201).json('berhasil Update');
-      return;
+      try {
+        const produk = await Produk.find();
+        const bentrok = produk.find((p) => p.kategoriId == req.body.id);
+        if (bentrok) {
+          throw (
+            'Masih Ada produk yang memakai Kategori Ini. Hapus Produk ' +
+            bentrok.nama
+          );
+        }
+        await Kategori.findByIdAndUpdate(req.body.id, {
+          kategori: req.body.kategori,
+        });
+        return res.status(201).json('berhasil Update');
+      } catch (error) {
+        return res.status(500).json(error);
+      }
     },
   };
 };

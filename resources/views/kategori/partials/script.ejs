@@ -5,20 +5,34 @@
 
 <script>
   let table = null;
-
-  const instance = axios.create({
-    withCredentials: true,
-  });
-  async function hapusKategori(id) {
-    try {
-      const response = await instance.delete(`${url}/kategori`, {
-        data: { id: id },
-      });
-      table.ajax.reload();
-    } catch (error) {
-      Swal.fire('Fail', error.response.data.message, 'error');
-      console.log(error);
-    }
+  instance
+    .get(`${url}/api/kategori`)
+    .then(({ data }) => {
+      console.log({ data });
+    })
+    .catch((err) => {});
+  async function hapusKategori(id, nama) {
+    Swal.fire({
+      title: '<h2> Hapus <strong> ' + nama + '</strong> ?</h2>',
+      text: '',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Hapus',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await instance.delete(`${url}/kategori`, {
+            data: { id: id },
+          });
+          table.ajax.reload();
+        } catch (error) {
+          Swal.fire('Fail', error.response.data.message, 'error');
+          console.log(error);
+        }
+      }
+    });
   }
   async function editKategori(id) {
     $('#kategoriModal').modal('show');
@@ -33,7 +47,7 @@
         form.querySelector('#kategori').value = res.data.kategori;
         form.querySelector('#kategori').dataset.id = res.data._id;
       })
-      .catch((err) => {});
+      .catch((error) => {});
   }
 
   function typeAdd() {
@@ -59,7 +73,7 @@
               return `
                       <div class="btn-group">
                           <button onclick="editKategori('${row._id}')" class="btn btn-info btn-sm">Edit</button>
-                          <button onclick="hapusKategori('${row._id}')" class="btn btn-danger btn-sm">Hapus</button>
+                          <button onclick="hapusKategori('${row._id}', '${row.kategori}')" class="btn btn-danger btn-sm">Hapus</button>
                       </div>
                   `;
             },
@@ -68,15 +82,14 @@
         language: {
           emptyTable: 'Tidak ada data',
         },
-        ajax: {
-          type: 'get',
-          xhrFields: {
-            withCredentials: true,
-          },
-          url: `${url}/api/kategori`,
-          contentType: 'application/json; charset=utf-8',
-          dataType: 'json',
-          datasrc: 'data',
+
+        ajax: function (d, cb) {
+          instance
+            .get(`${url}/api/kategori`)
+            .then(({ data }) => {
+              cb(data);
+            })
+            .catch((err) => {});
         },
       });
     });
@@ -119,7 +132,8 @@
           Swal.fire(response.data);
         })
         .catch((error) => {
-          console.log(err);
+          Swal.fire('Fail', error.response.data, 'error');
+          console.log(error);
         });
     }
   });

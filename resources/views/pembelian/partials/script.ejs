@@ -1,0 +1,134 @@
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<script>
+  let table = null;
+
+  function pembelian_detail() {
+    window.location = '/pembelian_detail';
+  }
+
+  function hapus(id) {
+    instance({
+      method: 'delete',
+      url: `${url}/pembelian`,
+      data: { id },
+    })
+      .then((res) => {
+        const { data } = res;
+        table.ajax.reload();
+      })
+      .catch((error) => {
+        Swal.fire({
+          icon: 'error',
+          text: error,
+        });
+        console.info(err);
+      });
+  }
+
+  async function createPembelian(id) {
+    instance({
+      method: 'post',
+      url: `${url}/pembelian/create`,
+      data: { id },
+    })
+      .then((res) => {
+        location.replace('/pembelian_detail');
+      })
+      .catch((err) => {
+        console.info(err);
+      });
+  }
+  const tambahTransaksi = document.querySelector('#tambahTransaksi');
+  tambahTransaksi.addEventListener('click', (e) => {
+    e.preventDefault();
+    $('#pembelianModal').modal('show');
+  });
+
+  window.addEventListener('load', function () {
+    instance({
+      method: 'get',
+      url: `${url}/api/pembelian`,
+    })
+      .then((res) => {
+        const { data } = res;
+        console.log(data);
+      })
+      .catch((err) => {
+        console.info(err);
+      });
+    $(function () {
+      $(document).ready(function () {
+        table = $('#pembelian').DataTable({
+          processing: false,
+          autoWidth: false,
+          bPaginate: true,
+          select: true,
+          columns: [
+            { data: 'index' },
+            { data: 'createdAt' },
+            { data: 'suplierId.nama' },
+            { data: 'totalItem' },
+            { data: 'totalHarga' },
+            { data: 'diskon' },
+            { data: 'bayar' },
+            {
+              mRender: function (data, type, row) {
+                return `
+                              <div class="btn-group" role="group" >
+                                  <button onclick="pembelian_detail('${row._id}')" class="btn btn-info btn-sm">Lihat</button>
+                                  <button onclick="hapus('${row._id}','${row.suplierId.nama}')" class="btn btn-danger btn-sm">Hapus</button>
+                              </div>
+                          `;
+              },
+            },
+          ],
+          language: {
+            emptyTable: 'Tidak ada data',
+          },
+          ajax: {
+            type: 'get',
+            url: `${url}/api/pembelian`,
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            datasrc: 'data',
+          },
+        });
+
+        const tableSuplier = $('#tableSuplier').DataTable({
+          processing: false,
+          autoWidth: false,
+          bPaginate: true,
+          select: true,
+          columns: [
+            { data: 'index' },
+            { data: 'nama' },
+            { data: 'alamat' },
+            { data: 'telepon' },
+            {
+              mRender: function (data, type, row) {
+                return `<button onclick="createPembelian('${row._id}')" class="btn btn-info btn-sm btn-flat">Lihat</button>`;
+              },
+            },
+          ],
+          language: {
+            emptyTable: 'Tidak ada data',
+          },
+          ajax: {
+            type: 'get',
+            xhrFields: {
+              withCredentials: true,
+            },
+            url: `${url}/api/suplier`,
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            datasrc: 'data',
+          },
+        });
+      });
+    });
+  });
+</script>

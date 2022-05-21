@@ -6,75 +6,17 @@
 <script>
   let table = null;
 
-  const checkboxParent = document.querySelector("[name='select_all']");
-  checkboxParent.addEventListener('click', function (e) {
-    const checkboxChild = document.querySelectorAll(
-      ".table tbody [type='checkbox']"
-    );
-    if (checkboxParent.checked === true) {
-      checkboxChild.forEach((item) => {
-        item.checked = true;
-      });
-    } else {
-      checkboxChild.forEach((item) => {
-        item.checked = false;
-      });
-    }
-  });
-
-  function cetakBarcode() {
-    //abmil semua element input yg tipe nya checkbox
-    const checkboxChild = document.querySelectorAll(
-      ".table tbody [type='checkbox']"
-    );
-    //ambil yang di centang
-    const checked = [...checkboxChild].filter((item) => {
-      return item.checked === true;
-    });
-    if (checked < 1) {
-      Swal.fire('Gagal', 'Pilih yang akan di cetak!', 'warning');
-      return false;
-    }
-    //tambahkan nama dan value
-    const checkedValue = checked.map((item, index) => {
-      return {
-        name: item.name,
-        id: item.value,
-      };
-    });
-    //buat element form
-    const form = document.createElement('form');
-    //atribut method = post
-    form.setAttribute('method', 'post');
-    //atribut action = url anda
-    form.setAttribute('action', `${url}/member/cetak_barcode`);
-    //atribut target = _black
-    form.setAttribute('target', '_blank');
-    //checkedValue = [{},{}]
-    for (const item of checkedValue) {
-      let input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = item.name;
-      input.value = item.id;
-      form.appendChild(input);
-    }
-    const card = document.querySelector('body .card');
-    card.appendChild(form);
-    form.submit();
-  }
-
-  async function editmember(id) {
+  async function editsuplier(id) {
     const nama = document.querySelector("[name='nama']");
     const alamat = document.querySelector("[name='alamat']");
     const telepon = document.querySelector("[name='telepon']");
     const idInput = document.querySelector("[name='id']");
 
-    $('#memberModal').modal('show');
-    const form = document.querySelector('#form');
-    form.dataset.type = 'update';
+    $('#suplierModal').modal('show');
+    document.querySelector('#form').dataset.type = 'update';
     instance({
       method: 'post',
-      url: `${url}/member/detail`,
+      url: `${url}/suplier/detail`,
       data: { id },
     })
       .then((res) => {
@@ -94,17 +36,17 @@
     const telepon = document.querySelector("[name='telepon']").value;
     const id = document.querySelector("[name='id']").value;
     instance
-      .put(`${url}/member`, { id, nama, alamat, telepon })
+      .put(`${url}/suplier`, { id, nama, alamat, telepon })
       .then((response) => {
         table.ajax.reload();
-        Swal.fire(response.data);
+        Swal.fire('berhasil', '', 'success');
       })
       .catch((error) => {
         console.log(error);
       });
   }
 
-  async function hapusmember(id, nama) {
+  async function hapussuplier(id, nama) {
     Swal.fire({
       title: '<h2> Hapus ' + nama + ' ?</h2>',
       text: ``,
@@ -116,9 +58,10 @@
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const response = await instance.delete(`${url}/member`, {
+          const response = await instance.delete(`${url}/suplier`, {
             data: { id: id },
           });
+          Swal.fire('<h1>berhasil hapus</h1>', '', 'success');
           table.ajax.reload();
         } catch (error) {
           Swal.fire('Fail', error.response.data.message, 'error');
@@ -140,29 +83,31 @@
     const alamat = document.querySelector("[name='alamat']").value;
     const telepon = document.querySelector("[name='telepon']").value;
     instance
-      .post(`${url}/member`, {
+      .post(`${url}/suplier`, {
         nama,
         alamat,
         telepon,
       })
       .then(function (response) {
         table.ajax.reload();
-        $('#memberModal').modal('hide');
-        Swal.fire(response.data);
+        $('#suplierModal').modal('hide');
       })
       .catch(function (error) {
         Swal.fire({
           icon: 'error',
-          text: error,
+          text: error.response.data.message,
         });
         console.log(error);
       });
 
-    // $('#memberModal').modal('hide');
+    // $('#suplierModal').modal('hide');
   }
 
   function typeAdd() {
     const form = document.querySelector('#form');
+    const nama = (document.querySelector("[name='nama']").value = '');
+    const alamat = (document.querySelector("[name='alamat']").value = '');
+    const telepon = (document.querySelector("[name='telepon']").value = '');
     form.dataset.type = 'add';
   }
 
@@ -175,11 +120,6 @@
           bPaginate: true,
           select: true,
           columns: [
-            {
-              mRender: function (data, type, row) {
-                return ` <input style="width:20px;height:20px" type='checkbox' name='${row.nama}' value="${row._id}" />`;
-              },
-            },
             { data: 'index' },
             { data: 'nama' },
             { data: 'alamat' },
@@ -191,8 +131,8 @@
               mRender: function (data, type, row) {
                 return `
                             <div class="btn-group">
-                                <button onclick="editmember('${row._id}')" class="btn btn-info btn-sm">Edit</button>
-                                <button onclick="hapusmember('${row._id}', '${row.nama}')" class="btn btn-danger btn-sm">Hapus</button>
+                                <button onclick="editsuplier('${row._id}')" class="btn btn-info btn-sm">Edit</button>
+                                <button onclick="hapussuplier('${row._id}','${row.nama}')" class="btn btn-danger btn-sm">Hapus</button>
                             </div>
                         `;
               },
@@ -201,14 +141,15 @@
           language: {
             emptyTable: 'Tidak ada data',
           },
-
-          ajax: function (d, cb) {
-            instance
-              .get(`${url}/api/member`)
-              .then(({ data }) => {
-                cb(data);
-              })
-              .catch((err) => {});
+          ajax: {
+            type: 'get',
+            xhrFields: {
+              withCredentials: true,
+            },
+            url: `${url}/api/suplier`,
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            datasrc: 'data',
           },
         });
       });

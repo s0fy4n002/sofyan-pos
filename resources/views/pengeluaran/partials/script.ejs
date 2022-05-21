@@ -1,0 +1,155 @@
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<script>
+  let table = null;
+
+  async function editpengeluaran(id) {
+    // return alert('edit ');
+    const deskripsi = document.querySelector("[name='deskripsi']");
+    const nominal = document.querySelector("[name='nominal']");
+    const idInput = document.querySelector("[name='id']");
+
+    $('#pengeluaranModal').modal('show');
+    document.querySelector('#form').dataset.type = 'update';
+    instance({
+      method: 'post',
+      url: `${url}/pengeluaran/detail`,
+      data: { id },
+    })
+      .then((res) => {
+        const { data } = res;
+        idInput.value = data._id;
+        deskripsi.value = data.deskripsi;
+        nominal.value = data.nominal;
+      })
+      .catch((err) => {
+        console.info(err);
+      });
+  }
+  function update() {
+    const deskripsi = document.querySelector("[name='deskripsi']").value;
+    const nominal = document.querySelector("[name='nominal']").value;
+    const id = document.querySelector("[name='id']").value;
+    instance
+      .put(`${url}/pengeluaran`, { id, deskripsi, nominal })
+      .then((response) => {
+        table.ajax.reload();
+        Swal.fire('berhasil', '', 'success');
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
+  async function hapuspengeluaran(id, deskripsi) {
+    Swal.fire({
+      title: '<h2> Hapus ' + deskripsi + ' ?</h2>',
+      text: ``,
+      icon: 'warning',
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      showCancelButton: true,
+      confirmButtonText: 'Ya hapus',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await instance.delete(`${url}/pengeluaran`, {
+            data: { id: id },
+          });
+          Swal.fire('<h1>berhasil hapus</h1>', '', 'success');
+          table.ajax.reload();
+        } catch (error) {
+          Swal.fire('Fail', error.response.data.message, 'error');
+          console.log(error);
+        }
+      }
+    });
+  }
+
+  const form = document.querySelector('#form');
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const type = form.dataset.type;
+    type === 'add' && add();
+    type === 'update' && update();
+  });
+  function add() {
+    const deskripsi = document.querySelector("[name='deskripsi']").value;
+    const nominal = document.querySelector("[name='nominal']").value;
+    instance
+      .post(`${url}/pengeluaran`, {
+        deskripsi,
+        nominal,
+      })
+      .then(function (response) {
+        table.ajax.reload();
+        $('#pengeluaranModal').modal('hide');
+      })
+      .catch(function (error) {
+        Swal.fire({
+          icon: 'error',
+          text: error.response.data.message,
+        });
+        console.log(error);
+      });
+
+    // $('#pengeluaranModal').modal('hide');
+  }
+
+  function typeAdd() {
+    $('#pengeluaranModal').modal('show');
+    const form = document.querySelector('#form');
+    const deskripsi = document.querySelector("[name='deskripsi']");
+    const nominal = document.querySelector("[name='nominal']");
+    deskripsi.value = '';
+    nominal.value = '';
+    form.dataset.type = 'add';
+  }
+
+  window.addEventListener('load', function () {
+    $(function () {
+      $(document).ready(function () {
+        table = $('#dt').DataTable({
+          processing: false,
+          autoWidth: false,
+          bPaginate: true,
+          select: true,
+          columns: [
+            { data: 'index' },
+            { data: 'createdAt' },
+            { data: 'deskripsi' },
+            { data: 'nominal' },
+            {
+              data: '',
+              name: '',
+              title: 'Option',
+              mRender: function (data, type, row) {
+                return `
+                            <div class="btn-group">
+                                <button onclick="editpengeluaran('${row._id}')" class="btn btn-info btn-sm">Edit</button>
+                                <button onclick="hapuspengeluaran('${row._id}','${row.deskripsi}')" class="btn btn-danger btn-sm">Hapus</button>
+                            </div>
+                        `;
+              },
+            },
+          ],
+          language: {
+            emptyTable: 'Tidak ada data',
+          },
+
+          ajax: function (d, cb) {
+            instance
+              .get(`${url}/api/pengeluaran`)
+              .then(({ data }) => {
+                cb(data);
+              })
+              .catch((err) => {});
+          },
+        });
+      });
+    });
+  });
+</script>

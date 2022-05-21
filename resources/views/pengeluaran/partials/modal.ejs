@@ -1,0 +1,58 @@
+<!-- Modal -->
+<div id="pengeluaranModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">
+          &times;
+        </button>
+        <h4 class="modal-title">Pengeluaran</h4>
+      </div>
+      <div class="modal-body">
+        <form id="form" action="" data-type="add">
+          <div class="form-group">
+            <label for="deskripsi">Deskripsi</label>
+            <input type="hidden" class="form-control" name="id" />
+            <input
+              type="text"
+              class="form-control"
+              data-id=""
+              name="deskripsi"
+              id="deskripsi"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="nominal">Nominal</label>
+            <input
+              type="number"
+              class="form-control"
+              data-id=""
+              name="nominal"
+              id="nominal"
+              required
+            />
+          </div>
+
+          <div
+            class="form-group"
+            style="display: flex; justify-content: flex-end"
+          >
+            <div class="btn-group">
+              <button type="submit" class="btn btn-primary">Simpan</button>
+              <button
+                type="button"
+                class="btn btn-default"
+                data-dismiss="modal"
+              >
+                Batal
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer"></div>
+    </div>
+  </div>
+</div>

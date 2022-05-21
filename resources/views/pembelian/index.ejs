@@ -1,0 +1,49 @@
+<div class="content-wrapper">
+  <section class="content-header">
+    <h1>
+      Pembelian
+      <small>Control panel</small>
+    </h1>
+    <ol class="breadcrumb">
+      <li>
+        <a href="/"><i class="fa fa-dashboard"></i> Home</a>
+      </li>
+      <li class="active">Pembelian</li>
+    </ol>
+  </section>
+  <section class="content">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="row">
+          <div class="col-md-12">
+            <button class="btn btn-info btn-sm" id="tambahTransaksi">
+              Tambah Transaksi
+            </button>
+          </div>
+        </div>
+        <div class="card" style="margin-top: 10px">
+          <div class="mt-2 panel panel-default">
+            <!-- Default panel contents -->
+            <div class="panel-heading">Pembelian</div>
+            <div class="panel-body" style="overflow: scroll">
+              <table id="pembelian" class="table">
+                <thead>
+                  <th width="10%">No</th>
+                  <th>Tanggal</th>
+                  <th>Suplier</th>
+                  <th>Total Item</th>
+                  <th>Total Harga</th>
+                  <th>Diskon</th>
+                  <th>Bayar</th>
+                  <th width="15%"><i class="fa fa-fw fa-gear"></i></th>
+                </thead>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<%- include('./partials/modal.ejs') %> <%- include('./partials/script.ejs') %>

@@ -2,6 +2,10 @@ const homeController = require('../app/controllers/homeController');
 const kategoriController = require('../app/controllers/kategoriController');
 const produkController = require('../app/controllers/produkController');
 const memberController = require('../app/controllers/memberController');
+const suplierController = require('../app/controllers/suplierController');
+const pengeluaranController = require('../app/controllers/pengeluaranController');
+const pembelianController = require('../app/controllers/pembelianController');
+const pembelianDetailController = require('../app/controllers/pembelianDetailController');
 const authController = require('../app/controllers/authController');
 const cloudinary = require('../app/config/cloudinary');
 const upload = require('../app/config/multer');
@@ -90,11 +94,50 @@ const init = (app) => {
     memberController().cetakBarcode
   );
 
-  app.get('*', function (req, res) {
-    res.render('404', {
-      layout: 'layouts/wrapper',
-      title: 'Page not found',
-    });
+  app.get('/suplier', isLoggedIn, suplierController().index);
+  app.get('/api/suplier', isLoggedIn, suplierController().api);
+  app.post('/suplier', isLoggedIn, suplierController().store);
+  app.post('/suplier/detail', isLoggedIn, suplierController().apiDetail);
+  app.put('/suplier', isLoggedIn, suplierController().update);
+  app.delete('/suplier', isLoggedIn, suplierController().delete);
+
+  app.get('/pengeluaran', isLoggedIn, pengeluaranController().index);
+  app.get('/api/pengeluaran', isLoggedIn, pengeluaranController().api);
+  app.post('/pengeluaran', isLoggedIn, pengeluaranController().store);
+  app.post(
+    '/pengeluaran/detail',
+    isLoggedIn,
+    pengeluaranController().apiDetail
+  );
+  app.put('/pengeluaran', isLoggedIn, pengeluaranController().update);
+  app.delete('/pengeluaran', isLoggedIn, pengeluaranController().delete);
+
+  app.get('/pembelian', isLoggedIn, pembelianController().index);
+  app.post('/pembelian/create', isLoggedIn, pembelianController().create);
+  app.get('/api/pembelian', isLoggedIn, pembelianController().api);
+  app.put('/pembelian', isLoggedIn, pembelianController().update);
+  app.delete('/pembelian', isLoggedIn, pembelianController().delete);
+
+  app.get('/pembelian_detail', isLoggedIn, pembelianDetailController().index);
+  app.post(
+    '/pembelian_detail/store',
+    isLoggedIn,
+    pembelianDetailController().store
+  );
+  app.post(
+    '/pembelian_detail/data',
+    isLoggedIn,
+    pembelianDetailController().data
+  );
+  app.delete(
+    '/pembelian_detail',
+    isLoggedIn,
+    pembelianDetailController().delete
+  );
+  app.put('/pembelian_detail', isLoggedIn, pembelianDetailController().update);
+
+  app.all('*', function (req, res) {
+    res.send('Page not found', 404);
   });
 };
 

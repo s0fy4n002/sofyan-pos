@@ -91,15 +91,15 @@
       });
   }
 
-  async function hapusProduk(id) {
+  async function hapusProduk(id, nama) {
     Swal.fire({
-      title: 'Are you sure?',
-      text: "You won't be able to revert this!",
+      title: '<h2> Hapus <strong> ' + nama + '</strong> ?</h2>',
+      text: '',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
-      confirmButtonText: 'Yes, delete it!',
+      confirmButtonText: 'Hapus',
     }).then((result) => {
       if (result.isConfirmed) {
         axios
@@ -107,11 +107,11 @@
           .then((res) => {
             console.log(res);
             table.ajax.reload();
-            Swal.fire('Deleted!', 'Your file has been deleted.', 'success');
+            Swal.fire('<h1>Berhasil Hapus</h1>', '', 'success');
           })
           .catch((err) => {
             console.log(err);
-            Swal.fire('Fail', 'Your file cannot deleted.', 'error');
+            Swal.fire('<h1>Gagal Hapus</h1>', '', 'error');
           });
       }
     });
@@ -181,7 +181,7 @@
               return `
                               <div class="btn-group" role="group" >
                                   <button onclick="editProduk('${row._id}')" class="btn btn-info btn-sm">Edit</button>
-                                  <button onclick="hapusProduk('${row._id}')" class="btn btn-danger btn-sm">Hapus</button>
+                                  <button onclick="hapusProduk('${row._id}','${row.nama}')" class="btn btn-danger btn-sm">Hapus</button>
                               </div>
                           `;
             },
@@ -190,16 +190,14 @@
         language: {
           emptyTable: 'Tidak ada data',
         },
-        ajax: {
-          type: 'get',
-          xhrFields: {
-            withCredentials: true,
-          },
-          dataType: 'json',
-          url: `${url}/api/produk`,
-          crossDomain: true,
-          contentType: 'application/json; charset=utf-8',
-          datasrc: 'data',
+
+        ajax: function (d, cb) {
+          instance
+            .get(`${url}/api/produk`)
+            .then(({ data }) => {
+              cb(data);
+            })
+            .catch((err) => {});
         },
       });
     });

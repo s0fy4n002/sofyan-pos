@@ -41,39 +41,39 @@
         </a>
       </li>
       <li>
-        <a href="/">
+        <a href="/suplier">
           <i class="fa fa-fw fa-truck"></i> <span>Supplier</span>
         </a>
       </li>
       <li class="header">TRANSAKSI</li>
       <li>
-        <a href="/">
+        <a href="/pengeluaran">
           <i class="fa fa-fw fa-money"></i><span>Pengeluaran</span>
         </a>
       </li>
       <li>
-        <a href="/"
+        <a href="/pembelian"
           ><i class="fa fa-fw fa-download"></i> <span>Pembelian</span>
         </a>
       </li>
       <li>
-        <a href="/">
+        <a href="/penjualan">
           <i class="fa fa-fw fa-upload"></i> <span>Penjualan</span>
         </a>
       </li>
       <li>
-        <a href="/">
+        <a href="/transaksi_lama">
           <i class="fa fa-fw fa-exchange"></i> <span>Transaksi Lama</span>
         </a>
       </li>
       <li>
-        <a href="/">
+        <a href="/transaksi_baru">
           <i class="fa fa-fw fa-exchange"></i> <span>Transaksi Baru</span>
         </a>
       </li>
       <li class="header">REPORT</li>
       <li>
-        <a href="/">
+        <a href="/laporan">
           <i class="fa fa-fw fa-file-pdf-o"></i> <span>Laporan</span>
         </a>
       </li>
@@ -81,3 +81,19 @@
   </section>
   <!-- /.sidebar -->
 </aside>
+<script>
+  const ul = document.querySelector('.sidebar-menu');
+  let li = ul.querySelectorAll('li');
+  let newLi = [];
+  const urlParams = window.location.pathname;
+  for (const iterator of [...li]) {
+    if (iterator.classList[0] === undefined) {
+      newLi.push(iterator);
+    }
+  }
+  for (const iterator of newLi) {
+    if (iterator.children[0].getAttribute('href') === urlParams) {
+      iterator.classList.add('active');
+    }
+  }
+</script>
