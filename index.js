@@ -15,18 +15,7 @@ const passport = require('passport');
 const initPassport = require('./app/config/passport');
 const session = require('express-session');
 const serverless = require('serverless-http');
-app.use(
-  cors({
-    origin: [
-      'http://192.168.100.27:3000',
-      'http://localhost:3000',
-      'https://pos-nodejs.vercel.app/',
-      'https://sofyanpos.herokuapp.com',
-    ],
-    methods: 'GET,POST,PUT,DELETE',
-    credentials: true,
-  })
-);
+
 app.use(cookieParser());
 
 app.use(
@@ -39,9 +28,8 @@ app.use(
     },
   })
 );
-app.use((req, res, next) => {
-  next();
-});
+
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -59,11 +47,27 @@ db();
 initPassport(passport);
 app.use(passport.initialize());
 app.use(passport.session());
+
 app.use((req, res, next) => {
   res.locals.user = req.user;
   res.locals.formatTanggal = formatTanggal;
   res.locals.formatTerbilang = formatTerbilang;
+  res.session = req.session
   next();
 });
+const whiteList = [
+  'http://192.168.100.27:3000',
+  'http://localhost:3000',
+  'https://pos-nodejs.vercel.app/',
+  'https://sofyanpos.herokuapp.com',
+]
+
+app.use(
+  cors({
+    origin: whiteList,
+    methods: 'GET,POST,PUT,DELETE',
+    credentials: true,
+  })
+);
 init(app);
 app.listen(PORT, () => console.log(`server is running on port :${PORT}`));

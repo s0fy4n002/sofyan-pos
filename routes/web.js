@@ -9,8 +9,6 @@ const pembelianDetailController = require('../app/controllers/pembelianDetailCon
 const authController = require('../app/controllers/authController');
 const cloudinary = require('../app/config/cloudinary');
 const upload = require('../app/config/multer');
-const User = require('../app/models/user');
-const bcrypt = require('bcrypt');
 
 const init = (app) => {
   app.get('/upload', upload.single('image'), async (req, res) => {
@@ -41,17 +39,19 @@ const init = (app) => {
   });
 
   function isLoggedIn(req, res, next) {
+    console.log({auth: req.isAuthenticated()})
     if (!req.isAuthenticated()) {
-      res.redirect('/login');
-      return;
+      return res.redirect('/login');
     }
     return next();
   }
+
   function toLogin(req, res, next) {
-    if (!req.isAuthenticated()) {
-      return next();
+    if (req.isAuthenticated()) {
+      return res.redirect('back');
     }
-    res.redirect('/');
+    return next();
+
   }
 
   app.post('/logout', authController().logout);
